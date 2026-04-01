@@ -19,6 +19,21 @@
 --purple:#a78bfa;
 --score-excellent:#22c55e;--score-good:#6ee7b7;--score-neutral:#64748b;
 --score-mild:#fb923c;--score-concern:#f87171;--score-serious:#ef4444;
+--controls-bg:rgba(10,12,16,.92);--modal-bg:rgba(0,0,0,.7);
+--hero-glow:rgba(110,231,183,.06);--accent-action-border:rgba(110,231,183,.15);
+}
+[data-theme="light"]{
+--bg:#f4f5f7;--surface:#ffffff;--surface2:#eef0f4;--surface3:#e2e5ec;
+--border:#d5d9e2;--border2:#c1c7d4;
+--text:#1a1d26;--text2:#4a5068;--text3:#7a82a0;
+--accent:#059669;--accent2:#047857;--accent-dim:#d1fae5;
+--red:#dc2626;--red-dim:#fee2e2;--orange:#ea580c;--orange-dim:#ffedd5;
+--yellow:#ca8a04;--yellow-dim:#fef9c3;--blue:#2563eb;--blue-dim:#dbeafe;
+--purple:#7c3aed;
+--score-excellent:#16a34a;--score-good:#059669;--score-neutral:#64748b;
+--score-mild:#ea580c;--score-concern:#dc2626;--score-serious:#b91c1c;
+--controls-bg:rgba(244,245,247,.92);--modal-bg:rgba(0,0,0,.4);
+--hero-glow:rgba(5,150,105,.06);--accent-action-border:rgba(5,150,105,.2);
 }
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
@@ -29,7 +44,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 
 /* HEADER */
 .hero{position:relative;padding:3rem 2rem 2rem;overflow:hidden;border-bottom:1px solid var(--border)}
-.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(110,231,183,.06) 0%,transparent 70%);pointer-events:none}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,var(--hero-glow) 0%,transparent 70%);pointer-events:none}
 .hero-inner{max-width:1200px;margin:0 auto}
 .hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,var(--text) 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-sub{color:var(--text2);font-size:.95rem;margin-top:.5rem;font-weight:300}
@@ -40,7 +55,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .disclaimer{margin-top:1.5rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:.75rem;color:var(--text3);line-height:1.5}
 
 /* CONTROLS */
-.controls{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.75rem 2rem}
+.controls{position:sticky;top:0;z-index:100;background:var(--controls-bg);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.75rem 2rem}
 .controls-inner{max-width:1200px;margin:0 auto;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
 .search-box{flex:1;min-width:200px;position:relative}
 .search-box input{width:100%;padding:.55rem 1rem .55rem 2.4rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;transition:border .2s}
@@ -71,7 +86,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 
 /* GENE CARD */
 .gene-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.15rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
-.gene-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.gene-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.15)}
+[data-theme="light"] .gene-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.08)}
 .gene-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
 .gene-card.score-pos::before{background:var(--score-good)}
 .gene-card.score-neg::before{background:var(--score-concern)}
@@ -80,10 +96,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.6rem}
 .card-gene{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.95rem;color:var(--accent)}
 .card-score{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem;padding:.15rem .45rem;border-radius:5px;flex-shrink:0}
-.card-score.pos{background:rgba(34,197,94,.12);color:var(--score-excellent)}
-.card-score.neg{background:rgba(248,113,113,.12);color:var(--score-concern)}
-.card-score.zero{background:rgba(100,116,139,.12);color:var(--score-neutral)}
-.card-score.serious-neg{background:rgba(239,68,68,.15);color:var(--score-serious)}
+.card-score.pos{background:var(--accent-dim);color:var(--score-excellent)}
+.card-score.neg{background:var(--red-dim);color:var(--score-concern)}
+.card-score.zero{background:var(--surface2);color:var(--score-neutral)}
+.card-score.serious-neg{background:var(--red-dim);color:var(--score-serious)}
 .card-snp{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
 .card-genotype{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text2);background:var(--surface2);padding:.1rem .35rem;border-radius:3px;margin-left:.4rem}
 .card-summary{font-size:.82rem;color:var(--text2);line-height:1.55;margin-top:.35rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -118,7 +134,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:.9rem}
 
 /* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;justify-content:center;align-items:center;padding:1rem}
+.modal-overlay{display:none;position:fixed;inset:0;background:var(--modal-bg);z-index:200;justify-content:center;align-items:center;padding:1rem}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:2rem}
 .modal-close{float:right;background:none;border:none;color:var(--text3);font-size:1.5rem;cursor:pointer;line-height:1}
@@ -127,7 +143,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .modal .modal-meta{display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap}
 .modal .meta-tag{font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:.25rem .5rem;border-radius:5px;background:var(--surface2);color:var(--text2)}
 .modal .modal-summary{font-size:.92rem;line-height:1.7;color:var(--text);margin:1rem 0}
-.modal .modal-action{background:var(--accent-dim);border:1px solid rgba(110,231,183,.15);border-radius:8px;padding:1rem;margin-top:1rem}
+.modal .modal-action{background:var(--accent-dim);border:1px solid var(--accent-action-border);border-radius:8px;padding:1rem;margin-top:1rem}
 .modal .modal-action h4{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.5rem}
 .modal .modal-action p{font-size:.85rem;color:var(--text2);line-height:1.6}
 
@@ -138,8 +154,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 .gh-box ol{padding-left:1.5rem;color:var(--text2);font-size:.85rem;line-height:2}
 .gh-box code{font-family:'JetBrains Mono',monospace;font-size:.78rem;background:var(--surface2);padding:.15rem .4rem;border-radius:3px;color:var(--accent)}
 
+/* THEME TOGGLE */
+.theme-toggle{position:absolute;top:2rem;right:2rem;display:flex;align-items:center;gap:.5rem;z-index:10}
+.theme-toggle-label{font-size:.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-weight:500}
+.toggle-track{width:48px;height:26px;border-radius:13px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;position:relative;transition:all .3s;flex-shrink:0}
+.toggle-track:hover{border-color:var(--accent)}
+.toggle-thumb{position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:var(--text3);transition:all .3s;display:flex;align-items:center;justify-content:center;font-size:.7rem;line-height:1}
+.toggle-track.on .toggle-thumb{left:24px;background:var(--accent)}
+.toggle-track.on{background:var(--accent-dim);border-color:var(--accent)}
+[data-theme="light"] .hero h1{background:linear-gradient(135deg,var(--text) 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
 @media(max-width:768px){
 .hero{padding:2rem 1rem 1.5rem}
+.theme-toggle{top:1.2rem;right:1rem}
+.theme-toggle-label{display:none}
 .controls{padding:.5rem 1rem}
 .content,.section-nav,.gh-help{padding-left:1rem;padding-right:1rem}
 .gene-grid{grid-template-columns:1fr}
@@ -153,6 +181,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 
 <div class="hero">
 <div class="hero-inner">
+<div class="theme-toggle">
+<span class="theme-toggle-label">Theme</span>
+<div class="toggle-track" id="themeToggle" title="Toggle light/dark mode">
+<div class="toggle-thumb">🌙</div>
+</div>
+</div>
 <h1>Personal Genomic Analysis</h1>
 <p class="hero-sub">Comprehensive SNP Interpretation — Health · Nutrition · Cognition · Fitness · Pharmacogenomics</p>
 <div class="hero-stats">
@@ -185,9 +219,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);lin
 
 <div class="gh-help">
 <div class="gh-box">
-<h3>🚀 How to Deploy as a GitHub Page</h3>
-<ol>
-</ol>
 </div>
 </div>
 
@@ -407,8 +438,40 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
 });
 
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const thumb = themeToggle.querySelector('.toggle-thumb');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  if (theme === 'light') {
+    themeToggle.classList.add('on');
+    thumb.textContent = '☀️';
+  } else {
+    themeToggle.classList.remove('on');
+    thumb.textContent = '🌙';
+  }
+  try { localStorage.setItem('genome-theme', theme); } catch(e) {}
+}
+
+function getPreferredTheme() {
+  try { const saved = localStorage.getItem('genome-theme'); if (saved) return saved; } catch(e) {}
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+themeToggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+
+setTheme(getPreferredTheme());
+
 // Init
 updateStats();
+render();
+</script>
+</body>
+</html>
 render();
 </script>
 </body>
