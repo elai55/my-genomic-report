@@ -1,2 +1,421 @@
-# my-genomic-report
-Enoch Lai
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Genomic Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#0a0c10;--surface:#12151c;--surface2:#1a1e28;--surface3:#222735;
+--border:#2a3040;--border2:#353d52;
+--text:#e8eaf0;--text2:#9ba3b8;--text3:#6b7490;
+--accent:#6ee7b7;--accent2:#34d399;--accent-dim:#1a4a3a;
+--red:#f87171;--red-dim:#4a1a1a;--orange:#fb923c;--orange-dim:#4a2e1a;
+--yellow:#fbbf24;--yellow-dim:#4a3e1a;--blue:#60a5fa;--blue-dim:#1a2e4a;
+--purple:#a78bfa;
+--score-excellent:#22c55e;--score-good:#6ee7b7;--score-neutral:#64748b;
+--score-mild:#fb923c;--score-concern:#f87171;--score-serious:#ef4444;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+::selection{background:var(--accent);color:var(--bg)}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* HEADER */
+.hero{position:relative;padding:3rem 2rem 2rem;overflow:hidden;border-bottom:1px solid var(--border)}
+.hero::before{content:'';position:absolute;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(110,231,183,.06) 0%,transparent 70%);pointer-events:none}
+.hero-inner{max-width:1200px;margin:0 auto}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-0.02em;background:linear-gradient(135deg,var(--text) 0%,var(--accent) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-sub{color:var(--text2);font-size:.95rem;margin-top:.5rem;font-weight:300}
+.hero-stats{display:flex;gap:2rem;margin-top:1.5rem;flex-wrap:wrap}
+.hero-stat{display:flex;flex-direction:column}
+.hero-stat-val{font-family:'JetBrains Mono',monospace;font-size:1.6rem;font-weight:600;color:var(--accent)}
+.hero-stat-label{font-size:.75rem;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.disclaimer{margin-top:1.5rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:.75rem;color:var(--text3);line-height:1.5}
+
+/* CONTROLS */
+.controls{position:sticky;top:0;z-index:100;background:rgba(10,12,16,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.75rem 2rem}
+.controls-inner{max-width:1200px;margin:0 auto;display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:.55rem 1rem .55rem 2.4rem;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:.85rem;font-family:inherit;outline:none;transition:border .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box::before{content:'⌕';position:absolute;left:.8rem;top:50%;transform:translateY(-50%);color:var(--text3);font-size:1rem}
+.filter-pills{display:flex;gap:.35rem;flex-wrap:wrap}
+.pill{padding:.35rem .7rem;border-radius:6px;font-size:.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text2);transition:all .2s;white-space:nowrap}
+.pill:hover{border-color:var(--text3);color:var(--text)}
+.pill.active{background:var(--accent-dim);border-color:var(--accent2);color:var(--accent)}
+.sort-btn{padding:.35rem .7rem;border-radius:6px;font-size:.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-family:inherit;transition:all .2s}
+.sort-btn:hover{border-color:var(--text3);color:var(--text)}
+
+/* NAV */
+.section-nav{max-width:1200px;margin:1.5rem auto 0;padding:0 2rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.nav-chip{padding:.5rem 1rem;border-radius:8px;font-size:.8rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .25s;display:flex;align-items:center;gap:.4rem}
+.nav-chip:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.nav-chip.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.nav-chip .chip-icon{font-size:1rem}
+.nav-chip .chip-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;background:var(--surface2);padding:.1rem .4rem;border-radius:4px;color:var(--text3)}
+
+/* CONTENT */
+.content{max-width:1200px;margin:0 auto;padding:1.5rem 2rem 4rem}
+.section-block{margin-bottom:2.5rem}
+.section-header{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+.section-header h2{font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700}
+.section-header .count{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text3);background:var(--surface2);padding:.2rem .5rem;border-radius:4px}
+.gene-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:.75rem}
+
+/* GENE CARD */
+.gene-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.15rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.gene-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.gene-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
+.gene-card.score-pos::before{background:var(--score-good)}
+.gene-card.score-neg::before{background:var(--score-concern)}
+.gene-card.score-zero::before{background:var(--score-neutral)}
+.gene-card.score-serious::before{background:var(--score-serious)}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;margin-bottom:.6rem}
+.card-gene{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.95rem;color:var(--accent)}
+.card-score{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem;padding:.15rem .45rem;border-radius:5px;flex-shrink:0}
+.card-score.pos{background:rgba(34,197,94,.12);color:var(--score-excellent)}
+.card-score.neg{background:rgba(248,113,113,.12);color:var(--score-concern)}
+.card-score.zero{background:rgba(100,116,139,.12);color:var(--score-neutral)}
+.card-score.serious-neg{background:rgba(239,68,68,.15);color:var(--score-serious)}
+.card-snp{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text3)}
+.card-genotype{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--text2);background:var(--surface2);padding:.1rem .35rem;border-radius:3px;margin-left:.4rem}
+.card-summary{font-size:.82rem;color:var(--text2);line-height:1.55;margin-top:.35rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gene-card.expanded .card-summary{-webkit-line-clamp:unset;overflow:visible}
+.card-action{margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);font-size:.78rem;color:var(--text3);line-height:1.5;display:none}
+.gene-card.expanded .card-action{display:block}
+.card-expand{font-size:.7rem;color:var(--text3);margin-top:.4rem;text-align:right;opacity:.5}
+.gene-card.expanded .card-expand{display:none}
+
+/* SCORE BAR */
+.score-bar-wrap{margin-top:1rem;padding:1rem 0}
+.score-bar{display:flex;height:4px;border-radius:2px;overflow:hidden;background:var(--surface2);gap:1px}
+.score-bar .seg{height:100%;transition:all .3s}
+
+/* SUMMARY DASHBOARD */
+.dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin:1.5rem 0}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.15rem}
+.dash-card h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:.75rem}
+.dash-row{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;font-size:.82rem}
+.dash-row .label{color:var(--text2)}
+.dash-row .val{font-family:'JetBrains Mono',monospace;font-weight:600}
+.dash-row .val.good{color:var(--accent)}
+.dash-row .val.bad{color:var(--red)}
+.dash-row .val.neutral{color:var(--text3)}
+
+/* SCORE LEGEND */
+.legend{display:flex;gap:1rem;flex-wrap:wrap;padding:.75rem 0;font-size:.72rem;color:var(--text3)}
+.legend-item{display:flex;align-items:center;gap:.3rem}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:.9rem}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;justify-content:center;align-items:center;padding:1rem}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;max-width:600px;width:100%;max-height:85vh;overflow-y:auto;padding:2rem}
+.modal-close{float:right;background:none;border:none;color:var(--text3);font-size:1.5rem;cursor:pointer;line-height:1}
+.modal h3{font-family:'Playfair Display',serif;font-size:1.4rem;margin-bottom:.25rem}
+.modal .modal-gene{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:.9rem}
+.modal .modal-meta{display:flex;gap:1rem;margin:1rem 0;flex-wrap:wrap}
+.modal .meta-tag{font-family:'JetBrains Mono',monospace;font-size:.75rem;padding:.25rem .5rem;border-radius:5px;background:var(--surface2);color:var(--text2)}
+.modal .modal-summary{font-size:.92rem;line-height:1.7;color:var(--text);margin:1rem 0}
+.modal .modal-action{background:var(--accent-dim);border:1px solid rgba(110,231,183,.15);border-radius:8px;padding:1rem;margin-top:1rem}
+.modal .modal-action h4{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:.5rem}
+.modal .modal-action p{font-size:.85rem;color:var(--text2);line-height:1.6}
+
+/* GITHUB HELP */
+.gh-help{max-width:1200px;margin:0 auto;padding:0 2rem 3rem}
+.gh-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.gh-box h3{font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:1rem;color:var(--text)}
+.gh-box ol{padding-left:1.5rem;color:var(--text2);font-size:.85rem;line-height:2}
+.gh-box code{font-family:'JetBrains Mono',monospace;font-size:.78rem;background:var(--surface2);padding:.15rem .4rem;border-radius:3px;color:var(--accent)}
+
+@media(max-width:768px){
+.hero{padding:2rem 1rem 1.5rem}
+.controls{padding:.5rem 1rem}
+.content,.section-nav,.gh-help{padding-left:1rem;padding-right:1rem}
+.gene-grid{grid-template-columns:1fr}
+.hero h1{font-size:1.8rem}
+.hero-stats{gap:1.25rem}
+.dashboard{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+<div class="hero-inner">
+<h1>Personal Genomic Analysis</h1>
+<p class="hero-sub">Comprehensive SNP Interpretation — Health · Nutrition · Cognition · Fitness · Pharmacogenomics</p>
+<div class="hero-stats">
+<div class="hero-stat"><span class="hero-stat-val" id="totalCount">197</span><span class="hero-stat-label">Variants Analyzed</span></div>
+<div class="hero-stat"><span class="hero-stat-val" id="favCount" style="color:var(--score-excellent)">0</span><span class="hero-stat-label">Favorable</span></div>
+<div class="hero-stat"><span class="hero-stat-val" id="conCount" style="color:var(--red)">0</span><span class="hero-stat-label">Need Attention</span></div>
+<div class="hero-stat"><span class="hero-stat-val" id="secCount">10</span><span class="hero-stat-label">Categories</span></div>
+</div>
+<div class="disclaimer">⚠️ <strong>Disclaimer:</strong> This report is for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Consult qualified healthcare professionals before making medical decisions based on genetic information.</div>
+</div>
+</div>
+
+<div class="controls">
+<div class="controls-inner">
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="Search genes, SNPs, or keywords...">
+</div>
+<div class="filter-pills">
+<button class="pill active" data-filter="all">All</button>
+<button class="pill" data-filter="positive" style="--pill-c:var(--score-good)">Favorable</button>
+<button class="pill" data-filter="negative" style="--pill-c:var(--red)">Attention</button>
+<button class="pill" data-filter="neutral">Neutral</button>
+</div>
+<button class="sort-btn" id="sortBtn" data-sort="section">Sort: Section ↓</button>
+</div>
+</div>
+
+<div class="section-nav" id="sectionNav"></div>
+<div class="content" id="content"></div>
+
+<div class="gh-help">
+<div class="gh-box">
+<h3>🚀 How to Deploy as a GitHub Page</h3>
+<ol>
+<li>Create a new repository on GitHub (e.g., <code>my-genomic-report</code>)</li>
+<li>Upload this <code>index.html</code> file to the repository root</li>
+<li>Go to <strong>Settings → Pages</strong> in your repository</li>
+<li>Under "Source", select <strong>Deploy from a branch</strong></li>
+<li>Choose <strong>main</strong> branch and <strong>/ (root)</strong> folder, then click Save</li>
+<li>Your page will be live at <code>https://yourusername.github.io/my-genomic-report/</code></li>
+</ol>
+</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal" id="modal">
+<button class="modal-close" id="modalClose">×</button>
+<div id="modalContent"></div>
+</div>
+</div>
+
+<script>
+const DATA = {"sections":[{"id":"cancer","title":"Cancer Predisposition","icon":"🛡️","genes":[{"snp":"rs386833395","gene":"BRCA1","genotype":"II","score":8,"summary":"No BRCA1 breast/ovarian cancer mutation. DNA repair genes work normally.","action":"Continue routine age-appropriate cancer screenings."},{"snp":"rs80359550","gene":"BRCA2","genotype":"II","score":8,"summary":"No BRCA2 cancer mutation. Both copies of this repair gene are intact.","action":"Standard screening schedule is appropriate."},{"snp":"rs63750066","gene":"APP","genotype":"CC","score":6,"summary":"No Alzheimer's-related APP mutation. Standard risk.","action":"Continue brain-healthy habits."},{"snp":"rs1801155","gene":"APC","genotype":"TT","score":7,"summary":"No APC colorectal cancer variant. Colon cancer tumor suppressor working normally.","action":"Maintain fiber-rich diet and follow standard colonoscopy guidelines."},{"snp":"rs34612342","gene":"MUTYH","genotype":"TT","score":7,"summary":"No MUTYH DNA repair defect. Oxidative damage repair is normal.","action":"Support with antioxidant-rich foods."},{"snp":"rs5742904","gene":"MLH1","genotype":"CC","score":8,"summary":"No Lynch syndrome mutation. DNA mismatch repair gene works normally.","action":"Keep up a Mediterranean-style diet and regular exercise."},{"snp":"rs36212066","gene":"TP53 region","genotype":"II","score":7,"summary":"No TP53 tumor suppressor mutation. 'Guardian of the genome' is intact.","action":"Minimize unnecessary radiation exposure, avoid tobacco."},{"snp":"rs121912617","gene":"PAH/ITPR2","genotype":"GG","score":6,"summary":"No pathogenic variant detected. Normal result.","action":"Continue general preventive health habits."},{"snp":"rs1042522","gene":"TP53","genotype":"GG","score":6,"summary":"Strongest tumor-fighting version of the p53 protein (Arg/Arg).","action":"Maintain with regular exercise, stress management, and adequate sleep."}]},{"id":"cardiovascular","title":"Cardiovascular & Blood","icon":"❤️","genes":[{"snp":"rs6025","gene":"F5","genotype":"CC","score":7,"summary":"No Factor V Leiden mutation. Blood clotting risk is normal.","action":"Stay hydrated, stay active during long travel."},{"snp":"rs5925","gene":"LDLR","genotype":"CT","score":-3,"summary":"One copy of a variant that reduces liver's ability to clear LDL cholesterol by ~10%.","action":"Monitor LDL cholesterol annually. Increase soluble fiber."},{"snp":"rs688","gene":"LDLR","genotype":"CT","score":-3,"summary":"Second LDL receptor variant, compounding cholesterol clearance. LDL may be 10-20 mg/dL higher.","action":"Get lipid panel every 6-12 months. Prioritize omega-3s."},{"snp":"rs1800562","gene":"HFE","genotype":"GG","score":7,"summary":"No hereditary iron overload (hemochromatosis) mutation.","action":"Maintain balanced iron intake."},{"snp":"rs1799945","gene":"HFE","genotype":"CC","score":6,"summary":"No second iron overload variant. No HFE-related iron risk.","action":"Monitor iron levels periodically."},{"snp":"rs4341","gene":"ACE","genotype":"CC","score":-1,"summary":"Lower ACE levels — mixed implications for blood pressure and endurance.","action":"Monitor blood pressure regularly. Reduce sodium."},{"snp":"rs5186","gene":"AGTR1","genotype":"AA","score":6,"summary":"No angiotensin receptor variant. Blood pressure regulation is normal.","action":"Continue heart-healthy habits."},{"snp":"rs1800795","gene":"IL6","genotype":"GG","score":-4,"summary":"High IL-6 production genotype — stronger inflammatory response.","action":"Anti-inflammatory Mediterranean diet. Exercise regularly."},{"snp":"rs3093059","gene":"CRP","genotype":"AA","score":5,"summary":"Low-CRP confirmation — favorable inflammatory baseline.","action":"Maintain anti-inflammatory diet and regular exercise."},{"snp":"rs1801253","gene":"ADRB1","genotype":"CG","score":-1,"summary":"Intermediate beta-blocker response.","action":"If beta-blockers prescribed, doctor should know this variant."},{"snp":"rs662799","gene":"APOA5","genotype":"GG","score":-6,"summary":"Both copies of rare variant impairing triglyceride clearance. Triglycerides may be substantially elevated.","action":"Check fasting triglycerides every 6 months. Limit sugar, refined carbs, alcohol."},{"snp":"rs855791","gene":"TMPRSS6","genotype":"AA","score":-5,"summary":"Both copies reduce iron absorption by ~30%. Monitor ferritin levels.","action":"Monitor ferritin every 6-12 months. Pair iron-rich foods with vitamin C."},{"snp":"rs1800588","gene":"LIPC","genotype":"CT","score":4,"summary":"Variant that raises 'good' HDL cholesterol. Liver processes HDL favorably.","action":"Maintain with regular aerobic exercise and healthy fats."},{"snp":"rs1800779","gene":"NOS3","genotype":"AA","score":-5,"summary":"Both copies reduce nitric oxide production — blood vessels less flexible.","action":"Beetroot juice, dark leafy greens, L-arginine-rich foods, regular exercise."},{"snp":"rs1801020","gene":"F12","genotype":"AG","score":-1,"summary":"Mildly reduced Factor XII clotting activation. Minimal impact.","action":"Monitor if unusual bleeding or clotting concerns arise."},{"snp":"rs5918","gene":"ITGB3","genotype":"TT","score":6,"summary":"Normal platelet function. No increased bleeding or clotting risk.","action":"Support with omega-3 fatty acids and regular exercise."},{"snp":"rs2235321","gene":"TFR2","genotype":"GG","score":5,"summary":"Normal iron sensing — body correctly detects iron levels.","action":"Maintain balanced iron intake."},{"snp":"rs6822844","gene":"IL2/IL21","genotype":"GG","score":5,"summary":"No autoimmune susceptibility from the IL-2/IL-21 region.","action":"Support immune health with balanced nutrition."},{"snp":"rs6795970","gene":"SCN10A","genotype":"GG","score":5,"summary":"Normal heart rhythm and low risk of conduction abnormalities.","action":"Maintain heart health with exercise and electrolyte balance."},{"snp":"rs505922","gene":"ABO","genotype":"CT","score":-2,"summary":"One copy of non-O blood group variant. Slightly higher clotting factors.","action":"Monitor cardiovascular risk factors."},{"snp":"rs8176719","gene":"ABO","genotype":"DI","score":0,"summary":"Heterozygous — one O allele and one non-O allele for blood type.","action":"Standard health maintenance."},{"snp":"rs2814778","gene":"ACKR1/DARC","genotype":"TT","score":0,"summary":"Duffy-positive. Most common genotype in non-African populations.","action":"Standard health maintenance."},{"snp":"rs2149954","gene":"EBF1 region","genotype":"CC","score":0,"summary":"Common reference genotype with no elevated blood pressure risk.","action":"Standard cardiovascular health maintenance."},{"snp":"rs6131295","gene":"JAG1 region","genotype":"AA","score":0,"summary":"No well-established risk associations at this time.","action":"Continue balanced lifestyle."}]},{"id":"methylation","title":"Methylation & B-Vitamins","icon":"🧬","genes":[{"snp":"rs1801133","gene":"MTHFR","genotype":"GG","score":7,"summary":"No MTHFR C677T mutation. Folate processing fully functional.","action":"Continue eating folate-rich foods."},{"snp":"rs1801131","gene":"MTHFR","genotype":"GG","score":0,"summary":"Standard MTHFR A1298C genotype. No significant impact on folate metabolism.","action":"Take methylfolate (400-800mcg/day) rather than plain folic acid."},{"snp":"rs1801394","gene":"MTRR","genotype":"AA","score":6,"summary":"Normal B12-dependent methionine synthase reductase function.","action":"Continue balanced diet rich in leafy greens, eggs, lean proteins."},{"snp":"rs1805087","gene":"MTR","genotype":"AA","score":6,"summary":"Normal methionine synthase function.","action":"Maintain adequate B12 intake."},{"snp":"rs4654748","gene":"NBPF3/ALPL","genotype":"CT","score":-1,"summary":"Intermediate B6 metabolism — mildly reduced B6 status possible.","action":"Include B6-rich foods daily: poultry, fish, potatoes, chickpeas."},{"snp":"rs234706","gene":"CBS","genotype":"GG","score":5,"summary":"Normal homocysteine processing through the CBS pathway.","action":"Continue supporting with adequate B6-rich foods."},{"snp":"rs602662","gene":"FUT2","genotype":"GG","score":5,"summary":"Confirms complete secretor haplotype for B12 absorption.","action":"Active secretor status supports B12 absorption."}]},{"id":"metabolic","title":"Diabetes & Metabolic","icon":"⚡","genes":[{"snp":"rs9939609","gene":"FTO","genotype":"TT","score":6,"summary":"No FTO obesity risk alleles. Weight regulation from this gene is normal.","action":"Continue healthy eating and regular exercise."},{"snp":"rs17782313","gene":"MC4R","genotype":"CT","score":-3,"summary":"One copy of variant that increases appetite through the melanocortin receptor.","action":"Practice mindful eating, use smaller plates, prioritize protein and fiber."},{"snp":"rs1801282","gene":"PPARG","genotype":"CC","score":-2,"summary":"Standard PPARG genotype with typical insulin sensitivity.","action":"Monitor glucose periodically. Exercise is especially beneficial."},{"snp":"rs7903146","gene":"TCF7L2","genotype":"CC","score":7,"summary":"No TCF7L2 risk alleles — strongest common type 2 diabetes protection.","action":"Maintain through regular physical activity and balanced nutrition."},{"snp":"rs4402960","gene":"IGF2BP2","genotype":"TT","score":5,"summary":"No insulin sensitivity risk from IGF2BP2.","action":"Continue maintaining a healthy lifestyle."},{"snp":"rs10811661","gene":"CDKN2A/B","genotype":"CT","score":-2,"summary":"One copy of variant mildly reducing pancreatic beta-cell function.","action":"Support pancreatic health with exercise, sleep, whole grains."},{"snp":"rs5219","gene":"KCNJ11","genotype":"CT","score":-2,"summary":"One copy of variant affecting potassium channels in insulin-secreting cells.","action":"Monitor fasting glucose and HbA1c annually."},{"snp":"rs13266634","gene":"SLC30A8","genotype":"TT","score":5,"summary":"Protective zinc transporter genotype for beta-cell function.","action":"Support with zinc-rich foods."},{"snp":"rs8050136","gene":"FTO","genotype":"CC","score":6,"summary":"Second FTO confirmation — no obesity risk variant.","action":"Continue healthy eating and regular exercise."},{"snp":"rs10830963","gene":"MTNR1B","genotype":"GG","score":-5,"summary":"Both copies impair melatonin-insulin connection. Late-night eating especially harmful.","action":"Avoid late-night eating. Morning exercise. Monitor fasting glucose."},{"snp":"rs6232","gene":"PCSK1","genotype":"TT","score":5,"summary":"Normal prohormone processing — proper appetite regulation and insulin processing.","action":"Continue maintaining healthy weight and balanced diet."},{"snp":"rs4149015","gene":"SLCO1B1 region","genotype":"GG","score":0,"summary":"Common reference genotype. No specific drug metabolism concerns.","action":"Standard result."}]},{"id":"nutrient","title":"Nutrient Metabolism","icon":"🥗","genes":[{"snp":"rs731236","gene":"VDR (TaqI)","genotype":"AA","score":-6,"summary":"Both copies reduce vitamin D receptor responsiveness. Need higher vitamin D levels.","action":"Supplement vitamin D. Target 40-60 ng/mL blood levels."},{"snp":"rs1544410","gene":"VDR (BsmI)","genotype":"CC","score":-6,"summary":"Both copies produce ~15-20% fewer vitamin D receptor proteins per cell.","action":"2,000-5,000 IU D3 daily, get sun, test 25(OH)D every 6 months."},{"snp":"rs7041","gene":"GC","genotype":"AC","score":-2,"summary":"Intermediate vitamin D binding protein levels.","action":"Supplement vitamin D, test every 6 months, target 40-60 ng/mL."},{"snp":"rs2282679","gene":"GC","genotype":"TT","score":-5,"summary":"Both copies lower circulating vitamin D levels. Four-gene vitamin D convergence.","action":"Never skip vitamin D, even in summer."},{"snp":"rs4988235","gene":"LCT/MCM6","genotype":"GG","score":-5,"summary":"Both copies of lactose intolerance variant. Cannot digest milk sugar efficiently.","action":"Use lactose-free dairy or lactase enzymes. Ensure adequate calcium."},{"snp":"rs12934922","gene":"BCMO1","genotype":"AT","score":-2,"summary":"Reduced conversion of plant beta-carotene to vitamin A.","action":"Include preformed vitamin A from eggs, dairy, and liver."},{"snp":"rs601338","gene":"FUT2","genotype":"GG","score":5,"summary":"Full secretor status — efficient B12 absorption in gut.","action":"Maintain with prebiotic-rich and fermented foods."},{"snp":"rs762551","gene":"CYP1A2","genotype":"AA","score":5,"summary":"Fast caffeine metabolism — liver clears caffeine quickly.","action":"Enjoy coffee in moderation; may provide health benefits."},{"snp":"rs174546","gene":"FADS1","genotype":"CT","score":-2,"summary":"Mild reduction in omega-3 conversion. Eat fatty fish or supplement EPA/DHA.","action":"Fatty fish 2-3x/week or supplement 1-2g EPA/DHA daily."},{"snp":"rs1761667","gene":"CD36","genotype":"GG","score":-4,"summary":"Both copies reduce fat taste perception. May overconsume high-fat foods.","action":"Practice portion control with high-fat items. Use measuring tools."},{"snp":"rs1799998","gene":"CYP11B2","genotype":"AG","score":-2,"summary":"Moderately sensitive to dietary sodium (salt).","action":"Monitor blood pressure. Maintain adequate potassium and limit sodium."},{"snp":"rs2187668","gene":"HLA-DQ2","genotype":"CC","score":6,"summary":"No celiac disease risk from HLA-DQ2.","action":"Gluten is fine for you."},{"snp":"rs7775228","gene":"HLA-DQ8","genotype":"CT","score":-2,"summary":"One copy of HLA-DQ8 celiac risk variant, but low risk overall.","action":"Celiac screening if GI symptoms with gluten arise."},{"snp":"rs10741657","gene":"CYP2R1","genotype":"AG","score":-2,"summary":"Mildly impaired liver conversion of vitamin D to active form. FIVE-gene vitamin D convergence.","action":"Supplement with D3 (not D2). Monitor 25(OH)D levels."}]},{"id":"cognition","title":"Cognition & Mood","icon":"🧠","genes":[{"snp":"rs4680","gene":"COMT","genotype":"AG","score":0,"summary":"Balanced 'warrior/worrier' — intermediate dopamine levels.","action":"Maintain with stress management, exercise, and adequate magnesium."},{"snp":"rs4633","gene":"COMT","genotype":"CC","score":0,"summary":"Part of COMT profile confirming intermediate dopamine breakdown.","action":"Support with tyrosine-rich foods."},{"snp":"rs165599","gene":"COMT","genotype":"GG","score":0,"summary":"Standard COMT gene regulation.","action":"Continue healthy lifestyle habits."},{"snp":"rs1800497","gene":"DRD2/ANKK1","genotype":"AG","score":-2,"summary":"Fewer dopamine D2 receptors — may need more stimulation to feel satisfied.","action":"Support dopamine naturally with exercise, music, sunlight."},{"snp":"rs4570625","gene":"TPH2","genotype":"TT","score":5,"summary":"Normal brain serotonin production rate.","action":"Support with adequate tryptophan, vitamin B6, and iron."},{"snp":"rs6311","gene":"HTR2A","genotype":"CT","score":-1,"summary":"Intermediate serotonin 2A receptor density.","action":"Boost serotonin with exercise, morning sunlight, tryptophan-rich foods."},{"snp":"rs6313","gene":"HTR2A","genotype":"AG","score":-1,"summary":"Confirms intermediate serotonin receptor density.","action":"Relevant for SSRI dosing if ever prescribed."},{"snp":"rs6265","gene":"BDNF","genotype":"TT","score":-6,"summary":"Both copies reduce BDNF secretion, critical for memory and brain plasticity. Aerobic exercise is the most effective countermeasure.","action":"Aerobic exercise 150-200 min/week. Learn new skills. Lion's mane mushroom."},{"snp":"rs17070145","gene":"KIBRA","genotype":"TT","score":6,"summary":"Strong episodic memory performance.","action":"Maintain with exercise, quality sleep, and cognitive engagement."},{"snp":"rs1044396","gene":"CHRNA4","genotype":"AG","score":-1,"summary":"Intermediate nicotinic receptor function for attention.","action":"Support with choline-rich foods."},{"snp":"rs363050","gene":"SNAP25","genotype":"AG","score":-1,"summary":"Intermediate synaptic vesicle release.","action":"Support with omega-3 and regular exercise."},{"snp":"rs8191992","gene":"CHRM2","genotype":"AA","score":-2,"summary":"Dampened acetylcholine release from muscarinic receptors.","action":"Support with dietary choline, omega-3s, and exercise."},{"snp":"rs3924999","gene":"NRG1","genotype":"AG","score":-2,"summary":"One copy affecting synaptic plasticity.","action":"Support with exercise, omega-3s, adequate sleep."},{"snp":"rs1344706","gene":"ZNF804A","genotype":"CC","score":5,"summary":"No schizophrenia risk from this connectivity gene.","action":"Continue supporting cognitive health."},{"snp":"rs429358","gene":"APOE","genotype":"TT","score":8,"summary":"No APOE4 allele — major Alzheimer's protection.","action":"Continue brain-healthy lifestyle."},{"snp":"rs7412","gene":"APOE","genotype":"CC","score":7,"summary":"Confirms APOE ε3/ε3 — lowest-risk for Alzheimer's.","action":"Mediterranean diet, exercise, social engagement."},{"snp":"rs53576","gene":"OXTR","genotype":"GG","score":6,"summary":"Enhanced social cognition and empathy.","action":"Nurture relationships, use social intuition as a wellbeing resource."},{"snp":"rs9536314","gene":"Klotho","genotype":"TT","score":0,"summary":"Standard Klotho protein function.","action":"Support with exercise, caloric awareness, vitamin D."},{"snp":"rs1006737","gene":"CACNA1C","genotype":"AG","score":-2,"summary":"One copy of calcium channel variant — mild mood regulation risk.","action":"Maintain mood stability with exercise, consistent sleep."},{"snp":"rs7294919","gene":"TESC","genotype":"TT","score":-5,"summary":"Both copies associated with smaller hippocampal volume. Exercise counteracts this.","action":"Prioritize aerobic exercise, meditation, adequate sleep."},{"snp":"rs6280","gene":"DRD3","genotype":"CT","score":-1,"summary":"Slightly enhanced dopamine sensitivity in emotional brain regions.","action":"Maintain dopamine balance with exercise."},{"snp":"rs6295","gene":"HTR1A","genotype":"CG","score":-1,"summary":"Intermediate serotonin 1A autoreceptor function.","action":"Support with exercise, morning sunlight, omega-3s."},{"snp":"rs13212041","gene":"HTR1B","genotype":"CC","score":5,"summary":"Favorable impulse control genotype.","action":"Maintain with exercise, meditation, adequate sleep."},{"snp":"rs1800532","gene":"TPH1","genotype":"GG","score":5,"summary":"Normal peripheral serotonin production.","action":"Continue supporting with tryptophan-rich foods."},{"snp":"rs1800544","gene":"ADRA2A","genotype":"CG","score":-1,"summary":"Intermediate alpha-2A receptor function.","action":"Regular training for adrenergic receptor sensitivity."},{"snp":"rs553668","gene":"ADRA2A","genotype":"AG","score":-1,"summary":"Second norepinephrine receptor variant — intermediate tone.","action":"Support with exercise, sleep, stress management."},{"snp":"rs5569","gene":"SLC6A2","genotype":"AG","score":-1,"summary":"Intermediate norepinephrine transporter function.","action":"Support with physical activity and adequate sleep."},{"snp":"rs1611115","gene":"DBH","genotype":"CC","score":5,"summary":"Efficient norepinephrine synthesis.","action":"Continue supporting with exercise and stress management."},{"snp":"rs6494223","gene":"CHRNA4","genotype":"TT","score":-5,"summary":"Both copies lower nicotinic receptor function, reducing sustained attention.","action":"Increase choline intake. Practice focused meditation. Regular exercise."},{"snp":"rs2273504","gene":"GRIK4","genotype":"GG","score":5,"summary":"No antidepressant-related suicidal ideation risk.","action":"Favorable for SSRI safety."},{"snp":"rs3810950","gene":"CHAT","genotype":"AG","score":-3,"summary":"One copy reducing acetylcholine production — critical for memory and attention.","action":"Increase choline: 3+ eggs/day, liver weekly, consider alpha-GPC."},{"snp":"rs17228602","gene":"CADM2","genotype":"CC","score":0,"summary":"Reference genotype. Normal cognitive processing speed.","action":"Maintain with exercise and omega-3s."},{"snp":"rs279858","gene":"GABRA2","genotype":"CT","score":-3,"summary":"Reduced GABA inhibitory tone — more sensitive to alcohol.","action":"Magnesium glycinate, L-theanine, yoga, avoid excess alcohol."},{"snp":"rs274622","gene":"ABCB1","genotype":"TT","score":-2,"summary":"Altered blood-brain barrier drug transport.","action":"Note in medical records for medication management."},{"snp":"rs6330","gene":"NGF","genotype":"AG","score":-2,"summary":"Reduced nerve growth factor supporting cholinergic neurons.","action":"Regular exercise, lion's mane mushroom, social engagement."},{"snp":"rs2857766","gene":"HLA/MOG","genotype":"CG","score":-2,"summary":"One copy of immune/inflammatory variant in HLA region.","action":"Anti-inflammatory diet, exercise, adequate vitamin D."},{"snp":"rs3851179","gene":"PICALM","genotype":"TT","score":7,"summary":"Best genotype for brain amyloid-beta clearance.","action":"Maintain with exercise, Mediterranean diet, social engagement."},{"snp":"rs1064395","gene":"NCAN","genotype":"AG","score":-2,"summary":"One copy — minor bipolar spectrum susceptibility.","action":"Consistent sleep schedule, exercise, omega-3s."},{"snp":"rs9960767","gene":"TCF4","genotype":"AA","score":6,"summary":"No psychiatric or Alzheimer's risk.","action":"Continue supporting cognitive health."},{"snp":"rs9331888","gene":"CLU","genotype":"CG","score":-2,"summary":"One copy mildly reducing amyloid clearance.","action":"Maintain with exercise, healthy diet, quality sleep."},{"snp":"rs3818361","gene":"CR1","genotype":"GG","score":6,"summary":"Normal complement-mediated clearance of Alzheimer's proteins.","action":"Continue exercise, omega-3s, adequate sleep."},{"snp":"rs5751876","gene":"ADORA2A","genotype":"CC","score":-5,"summary":"Both copies increase caffeine-induced anxiety and sleep disruption.","action":"Limit to 1 cup before noon. Switch to decaf afternoon."},{"snp":"rs1360780","gene":"FKBP5","genotype":"TT","score":-6,"summary":"Cortisol elevated ~30-50% longer after stress. Strongest genetic predictor of PTSD risk.","action":"Daily meditation, regular therapy, vigorous exercise."},{"snp":"rs110402","gene":"CRHR1","genotype":"AG","score":-1,"summary":"Partially buffering stress response.","action":"Meditation, deep breathing, exercise, adequate sleep."},{"snp":"rs225014","gene":"DIO2","genotype":"CC","score":-5,"summary":"Reduces brain T4-to-T3 thyroid conversion by 10-20%. Possible 'brain hypothyroidism' with normal tests.","action":"Get full thyroid panel including free T3. Selenium 200mcg/day."},{"snp":"rs1800795_cog","gene":"IL-6 (cognitive)","genotype":"GG","score":-4,"summary":"High IL-6 affecting brain — neuroinflammation suppresses hippocampal function.","action":"Anti-inflammatory Mediterranean diet, exercise, sleep."},{"snp":"rs1205","gene":"CRP","genotype":"TT","score":5,"summary":"Low baseline CRP production — partially buffers IL-6 GG.","action":"Maintain anti-inflammatory habits."},{"snp":"rs174537","gene":"FADS1","genotype":"GT","score":-2,"summary":"Second omega-3 conversion variant.","action":"Fatty fish or fish oil supplements."},{"snp":"rs174575","gene":"FADS2","genotype":"CC","score":5,"summary":"Normal omega-6/omega-3 processing.","action":"Continue omega-3-rich foods."},{"snp":"rs5128","gene":"APOC3","genotype":"CG","score":-3,"summary":"One copy raises triglycerides by blocking clearance.","action":"Monitor triglycerides. Limit refined carbs. Increase omega-3s."},{"snp":"rs11046205","gene":"SLCO1C1","genotype":"AG","score":-2,"summary":"One copy may reduce thyroid hormone transport into brain.","action":"Monitor thyroid function. Selenium and zinc."},{"snp":"rs2550948","gene":"SLC6A3","genotype":"CC","score":5,"summary":"Normal dopamine reuptake speed.","action":"Continue with exercise, sleep, balanced protein."},{"snp":"rs6347","gene":"SLC6A3","genotype":"TT","score":5,"summary":"Normal dopamine transporter function confirmed.","action":"Maintain with adequate sleep and exercise."},{"snp":"rs2007153","gene":"DBH","genotype":"CC","score":5,"summary":"Second confirmation of efficient norepinephrine production.","action":"Continue supporting catecholamine balance."},{"snp":"rs1800896","gene":"IL10","genotype":"TT","score":-5,"summary":"Reduced IL-10 — weaker ability to turn off inflammation.","action":"Actively pursue anti-inflammatory lifestyle."},{"snp":"rs1143627","gene":"IL1B","genotype":"AA","score":-5,"summary":"High IL-1B production — three-gene inflammatory imbalance.","action":"Anti-inflammatory diet, exercise, curcumin."},{"snp":"rs2802292","gene":"FOXO3","genotype":"TT","score":-2,"summary":"No longevity-protective FOXO3 alleles.","action":"Support with exercise, caloric awareness, sleep."},{"snp":"rs4307059","gene":"CDH9/CDH10","genotype":"CT","score":-2,"summary":"One copy in autism-associated region.","action":"Support neural connectivity with exercise, omega-3s."},{"snp":"rs265981","gene":"DRD1","genotype":"AG","score":-2,"summary":"Intermediate D1 receptor expression.","action":"Support with exercise, sleep, tyrosine-rich foods."},{"snp":"rs301430","gene":"SLC1A1","genotype":"CC","score":4,"summary":"Efficient glutamate clearance — lower OCD risk.","action":"Continue supporting neural health."},{"snp":"rs2535629","gene":"ITIH3","genotype":"AG","score":-3,"summary":"One copy associated with psychiatric conditions.","action":"Anti-inflammatory lifestyle, exercise, stress management."},{"snp":"rs10994359","gene":"ANK3","genotype":"TT","score":-4,"summary":"Two copies of bipolar disorder risk variant in ANK3.","action":"Consistent sleep, exercise, omega-3s, stress management."},{"snp":"rs2278106","gene":"EPHA7","genotype":"GG","score":0,"summary":"Reference genotype — no known risk.","action":"Standard neurological health maintenance."},{"snp":"rs2278107","gene":"EPHA7","genotype":"TT","score":0,"summary":"No well-established risk associations.","action":"Continue supporting neural health."},{"snp":"rs2075650","gene":"TOMM40","genotype":"AA","score":7,"summary":"Protective mitochondrial function — lower Alzheimer's risk.","action":"Maintain with exercise, Mediterranean diet, quality sleep."}]},{"id":"fitness","title":"Physical Performance","icon":"💪","genes":[{"snp":"rs1815739","gene":"ACTN3","genotype":"CT","score":0,"summary":"Mixed muscle fiber type — versatility for both sprint and endurance.","action":"Train with mix of HIIT, steady-state cardio, and resistance training."},{"snp":"rs1800012","gene":"COL1A1","genotype":"CC","score":5,"summary":"Normal type I collagen — no increased injury risk.","action":"Train confidently with proper warm-ups."},{"snp":"rs2707466","gene":"ACE/ACVR2B","genotype":"CC","score":-1,"summary":"Intermediate muscle growth signaling.","action":"Maintain mixed training."},{"snp":"rs8192440","gene":"ALDH2","genotype":"GG","score":5,"summary":"Efficient aldehyde dehydrogenase — normal exercise recovery.","action":"Continue balanced lifestyle."},{"snp":"rs4253778","gene":"PPARA","genotype":"GG","score":5,"summary":"Efficient fatty acid burning (elite endurance genotype).","action":"Lean into aerobic training."},{"snp":"rs8192678","gene":"PPARGC1A","genotype":"CT","score":4,"summary":"Good mitochondrial production — efficient energy during exercise.","action":"Consistency in aerobic exercise compounds this advantage."},{"snp":"rs2016520","gene":"PPARD","genotype":"TT","score":5,"summary":"Enhanced aerobic energy utilization — wired for endurance.","action":"Excellent for long-duration activities."},{"snp":"rs2010963","gene":"VEGFA","genotype":"CC","score":5,"summary":"Strong exercise-induced blood vessel growth.","action":"Regular exercise maximizes this."},{"snp":"rs3025039","gene":"VEGFA","genotype":"CC","score":5,"summary":"Second vascular growth confirmation.","action":"Consistent training amplifies this."},{"snp":"rs11549465","gene":"HIF1A","genotype":"CC","score":5,"summary":"Normal oxygen sensing during exercise.","action":"Body adapts well to altitude and intense exercise."},{"snp":"rs1617640","gene":"EPO","genotype":"AC","score":3,"summary":"Above-average red blood cell production for oxygen delivery.","action":"Train at varied intensities."},{"snp":"rs1042713","gene":"ADRB2","genotype":"GG","score":5,"summary":"Elite-associated adrenaline receptor variant.","action":"Push your training intensity."},{"snp":"rs1042714","gene":"ADRB2","genotype":"CG","score":0,"summary":"Intermediate second adrenaline receptor.","action":"Continue regular mixed training."},{"snp":"rs4994","gene":"ADRB3","genotype":"AA","score":5,"summary":"Efficient fat mobilization during exercise.","action":"Fasted morning cardio for enhanced fat oxidation."},{"snp":"rs1801253_fit","gene":"ADRB1","genotype":"CG","score":-1,"summary":"Intermediate beta-blocker response.","action":"Pharmacogenomic relevance if beta-blockers prescribed."},{"snp":"rs1800629","gene":"TNF","genotype":"GG","score":5,"summary":"Low TNF production — favorable exercise recovery.","action":"Maintain with anti-inflammatory diet."},{"snp":"rs11556218","gene":"IL16","genotype":"TT","score":5,"summary":"Favorable inflammatory recovery profile.","action":"Support with balanced nutrition and rest."},{"snp":"rs17602729","gene":"AMPD1","genotype":"GG","score":5,"summary":"Full muscle energy metabolism.","action":"Muscles maintain ATP well during intense exercise."},{"snp":"rs1805086","gene":"MSTN","genotype":"TT","score":5,"summary":"Normal myostatin levels.","action":"Resistance training 3-4x/week."},{"snp":"rs8111989","gene":"APOE region","genotype":"CT","score":-1,"summary":"Moderate HDL response to aerobic exercise.","action":"Regular aerobic exercise is especially important."},{"snp":"rs1800169","gene":"BDNF","genotype":"GG","score":5,"summary":"Protective BDNF variant compensating for rs6265 result.","action":"Support neurotrophic factors with exercise."},{"snp":"rs143384","gene":"GDF5","genotype":"AG","score":-3,"summary":"One copy reducing joint cartilage maintenance.","action":"Joint-friendly training, proper form, consider glucosamine."},{"snp":"rs3101336","gene":"NEGR1","genotype":"CC","score":5,"summary":"Protective body composition variant.","action":"Maintain with exercise and balanced nutrition."},{"snp":"rs2305160","gene":"BMPR2","genotype":"AG","score":-2,"summary":"One copy linked to pulmonary blood vessel function.","action":"Maintain strict sleep-wake schedule."},{"snp":"rs1801184","gene":"COL3A1","genotype":"CT","score":-2,"summary":"One copy of type III collagen variant.","action":"Vitamin C for collagen synthesis. Warm up thoroughly."},{"snp":"rs1695","gene":"GSTP1","genotype":"AA","score":5,"summary":"Normal glutathione detoxification.","action":"Maintain with cruciferous vegetables."},{"snp":"rs6746030","gene":"SCN9A","genotype":"GG","score":3,"summary":"Slightly higher pain threshold than average.","action":"Discuss with doctor for pain management."}]},{"id":"pharma","title":"Pharmacogenomics & Sleep","icon":"💊","genes":[{"snp":"rs4244285","gene":"CYP2C19","genotype":"AG","score":-5,"summary":"CYP2C19 intermediate metabolizer — processes certain drugs differently. Tell every doctor.","action":"Share with EVERY prescribing doctor. Affects clopidogrel, some SSRIs, PPIs."},{"snp":"rs4986893","gene":"CYP2C19","genotype":"GG","score":5,"summary":"No CYP2C19*3 loss-of-function allele.","action":"Continue monitoring drug metabolism."},{"snp":"rs1801260","gene":"CLOCK","genotype":"AA","score":-2,"summary":"Evening chronotype tendency — naturally a night owl.","action":"Bright light upon waking. No screens before bed."},{"snp":"rs12927162","gene":"ADA","genotype":"AA","score":5,"summary":"Normal adenosine deaminase function.","action":"Normal adenosine metabolism supports healthy sleep."},{"snp":"rs73598374","gene":"ADA","genotype":"CC","score":5,"summary":"Second ADA confirmation — normal adenosine metabolism.","action":"Continue good sleep hygiene."},{"snp":"rs228697","gene":"PER3","genotype":"CC","score":0,"summary":"Moderately flexible sleep timing.","action":"Consistent sleep-wake times."},{"snp":"rs2278749","gene":"ARNTL/BMAL1","genotype":"CC","score":-2,"summary":"May have subtle circadian rhythm misalignment.","action":"Strict sleep schedule, morning sunlight, regular meals."},{"snp":"rs9296249","gene":"BTBD9 region","genotype":"TT","score":-5,"summary":"Both copies linked to restless legs syndrome. Keep ferritin above 50-75 ng/mL.","action":"Ferritin above 75 ng/mL. Magnesium glycinate 400mg nightly."},{"snp":"rs10994336","gene":"ANK3","genotype":"CC","score":5,"summary":"No bipolar disorder risk. Normal circadian signaling.","action":"Maintain mood stability through consistent routines."},{"snp":"rs2653349","gene":"HCRTR2","genotype":"GG","score":0,"summary":"Normal orexin receptor function for wakefulness.","action":"Standard sleep health."},{"snp":"rs2305795","gene":"P2RY11/EIF3G","genotype":"AA","score":-4,"summary":"Both copies of narcolepsy susceptibility variant.","action":"Consistent sleep schedule. Consult sleep specialist if excessive sleepiness."},{"snp":"rs1154155","gene":"TCRA locus","genotype":"GG","score":5,"summary":"Protective against autoimmune narcolepsy.","action":"Continue healthy sleep habits."},{"snp":"rs28936679","gene":"BHLHE41/DEC2","genotype":"GG","score":5,"summary":"No short-sleep mutation. Require standard 7-9 hours.","action":"Aim for 7-9 hours."},{"snp":"rs9394302","gene":"MEIS1 region","genotype":"TT","score":-3,"summary":"Risk variant at a restless legs locus.","action":"Maintain iron stores. Discuss if symptoms appear."},{"snp":"rs2312147","gene":"MEIS1 region","genotype":"CC","score":5,"summary":"Protective variant offsetting some RLS risk.","action":"Continue iron optimization, exercise, magnesium."},{"snp":"rs12593813","gene":"MAP2K5/SKOR1","genotype":"AA","score":-3,"summary":"Both copies at restless legs locus.","action":"Keep ferritin above 75 ng/mL."},{"snp":"rs2279020","gene":"GABRA1","genotype":"AA","score":5,"summary":"Normal GABA-A receptor signaling for sleep.","action":"Maintain good sleep hygiene."},{"snp":"rs356220","gene":"SNCA","genotype":"CT","score":-3,"summary":"One copy increasing alpha-synuclein — Parkinson's-related protein.","action":"Regular aerobic exercise. Neurological check-ups after 50."},{"snp":"rs903361","gene":"DYRK3 region","genotype":"AG","score":-1,"summary":"Mild restless legs susceptibility.","action":"Standard sleep health maintenance."},{"snp":"rs1135840","gene":"CYP2D6","genotype":"GG","score":-1,"summary":"Intermediate CYP2D6 activity.","action":"Note in medical records for drug metabolism."},{"snp":"rs12248560","gene":"CYP2C19","genotype":"CC","score":4,"summary":"No ultra-rapid metabolizer allele. Confirms intermediate metabolizer.","action":"Share with physicians."},{"snp":"rs4149056","gene":"SLCO1B1","genotype":"TT","score":5,"summary":"No statin-induced muscle pain risk.","action":"Favorable if statins needed."},{"snp":"rs1799853","gene":"CYP2C9","genotype":"CC","score":5,"summary":"Normal CYP2C9 drug metabolism.","action":"Standard warfarin metabolism."},{"snp":"rs1057910","gene":"CYP2C9","genotype":"AA","score":5,"summary":"Normal CYP2C9 (second confirmation).","action":"No dose adjustments needed."},{"snp":"rs9923231","gene":"VKORC1","genotype":"TT","score":-5,"summary":"Highly sensitive to warfarin. Need ~50% lower doses if prescribed.","action":"Tell doctors immediately if warfarin prescribed."},{"snp":"rs1056560","gene":"CRY2","genotype":"AC","score":-1,"summary":"Intermediate circadian period regulation.","action":"Consistent light-dark cycles and sleep schedule."}]},{"id":"hair","title":"Hair Loss & Alopecia","icon":"💇","genes":[{"snp":"rs1160312","gene":"PAX1/FOXA2","genotype":"GG","score":5,"summary":"Protective against androgenetic alopecia.","action":"Maintain with adequate protein, iron, zinc, biotin, vitamin D."},{"snp":"rs2180439","gene":"PAX1/FOXA2","genotype":"CC","score":5,"summary":"Second hair loss protection variant.","action":"Continue nutrient-rich diet."},{"snp":"rs12565727","gene":"TARDBP","genotype":"AG","score":-2,"summary":"Mild hair loss susceptibility from TDP-43 pathway.","action":"Ferritin above 50, biotin, zinc, vitamin D."},{"snp":"rs1998076","gene":"PAX1/FOXA2","genotype":"AA","score":5,"summary":"Third protective hair variant.","action":"Support with adequate nutrition."},{"snp":"rs2223841","gene":"AR","genotype":"T","score":-2,"summary":"Some androgen receptor sensitivity affecting hair.","action":"Consider saw palmetto, discuss finasteride if thinning."},{"snp":"rs7349332","gene":"WNT10A","genotype":"CC","score":5,"summary":"Normal hair follicle growth signaling.","action":"Continue good nutrition and scalp health."},{"snp":"rs2073963","gene":"HDAC9","genotype":"GT","score":-2,"summary":"Mild epigenetic hair loss risk.","action":"Anti-inflammatory diet, stress management."},{"snp":"rs12203592","gene":"IRF4","genotype":"CC","score":5,"summary":"Normal hair aging and pigmentation. No premature graying.","action":"Continue UV protection."},{"snp":"rs4752566","gene":"FRAS1","genotype":"TT","score":5,"summary":"Normal follicle structure integrity.","action":"Support with adequate protein and vitamins."}]},{"id":"reading","title":"Reading & Language","icon":"📖","genes":[{"snp":"rs600753","gene":"DYX1C1","genotype":"CC","score":-3,"summary":"Two copies of risk variant in dyslexia susceptibility gene.","action":"Break reading into shorter sessions. Annotation and highlighting."},{"snp":"rs9460974","gene":"DCDC2 region","genotype":"TT","score":-2,"summary":"Two copies near DCDC2 — second dyslexia susceptibility locus.","action":"Short focused sessions. Active recall. Mind mapping."},{"snp":"rs761100","gene":"NRSN1 region","genotype":"AC","score":-1,"summary":"One copy near neurensin-1 — language processing region.","action":"Good reading hygiene: adequate lighting, breaks."},{"snp":"rs2143340","gene":"KIAA0319","genotype":"AA","score":-4,"summary":"Two copies of risk variant in one of most well-replicated dyslexia genes.","action":"Multi-sensory learning. Text-to-speech. Structured literacy."}]}]};
+
+// State
+let activeSection = 'all';
+let activeFilter = 'all';
+let searchQuery = '';
+let sortMode = 'section'; // section, score-asc, score-desc
+const expandedCards = new Set();
+
+function getScoreClass(s) {
+  if (s >= 4) return 'pos';
+  if (s > 0) return 'pos';
+  if (s === 0) return 'zero';
+  if (s >= -3) return 'neg';
+  return 'serious-neg';
+}
+
+function getCardClass(s) {
+  if (s > 0) return 'score-pos';
+  if (s === 0) return 'score-zero';
+  if (s >= -4) return 'score-neg';
+  return 'score-serious';
+}
+
+function getScoreLabel(s) {
+  if (s >= 7) return 'Excellent';
+  if (s >= 4) return 'Good';
+  if (s >= 1) return 'Slightly Good';
+  if (s === 0) return 'Neutral';
+  if (s >= -3) return 'Mild Concern';
+  if (s >= -6) return 'Concerning';
+  return 'Serious';
+}
+
+function getAllGenes() {
+  const all = [];
+  DATA.sections.forEach(s => {
+    s.genes.forEach(g => {
+      all.push({ ...g, sectionId: s.id, sectionTitle: s.title, sectionIcon: s.icon });
+    });
+  });
+  return all;
+}
+
+function filterGenes(genes) {
+  let result = genes;
+  if (activeSection !== 'all') {
+    result = result.filter(g => g.sectionId === activeSection);
+  }
+  if (activeFilter === 'positive') result = result.filter(g => g.score > 0);
+  else if (activeFilter === 'negative') result = result.filter(g => g.score < 0);
+  else if (activeFilter === 'neutral') result = result.filter(g => g.score === 0);
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    result = result.filter(g =>
+      g.gene.toLowerCase().includes(q) ||
+      g.snp.toLowerCase().includes(q) ||
+      g.summary.toLowerCase().includes(q) ||
+      g.action.toLowerCase().includes(q)
+    );
+  }
+  if (sortMode === 'score-desc') result.sort((a, b) => b.score - a.score);
+  else if (sortMode === 'score-asc') result.sort((a, b) => a.score - b.score);
+  return result;
+}
+
+function renderNav() {
+  const nav = document.getElementById('sectionNav');
+  let html = `<div class="nav-chip ${activeSection==='all'?'active':''}" data-section="all"><span class="chip-icon">📊</span>All<span class="chip-count">${getAllGenes().length}</span></div>`;
+  DATA.sections.forEach(s => {
+    html += `<div class="nav-chip ${activeSection===s.id?'active':''}" data-section="${s.id}"><span class="chip-icon">${s.icon}</span>${s.title}<span class="chip-count">${s.genes.length}</span></div>`;
+  });
+  nav.innerHTML = html;
+  nav.querySelectorAll('.nav-chip').forEach(el => {
+    el.addEventListener('click', () => {
+      activeSection = el.dataset.section;
+      render();
+    });
+  });
+}
+
+function renderContent() {
+  const content = document.getElementById('content');
+  const allGenes = getAllGenes();
+  const filtered = filterGenes(allGenes);
+
+  if (filtered.length === 0) {
+    content.innerHTML = '<div class="empty-state">No variants match your search or filters.</div>';
+    return;
+  }
+
+  // Group by section if sorting by section
+  let html = '';
+  if (sortMode === 'section') {
+    const grouped = {};
+    filtered.forEach(g => {
+      if (!grouped[g.sectionId]) grouped[g.sectionId] = { title: g.sectionTitle, icon: g.sectionIcon, genes: [] };
+      grouped[g.sectionId].genes.push(g);
+    });
+    Object.entries(grouped).forEach(([id, sec]) => {
+      html += `<div class="section-block" id="sec-${id}">`;
+      html += `<div class="section-header"><span style="font-size:1.3rem">${sec.icon}</span><h2>${sec.title}</h2><span class="count">${sec.genes.length} variants</span></div>`;
+      html += `<div class="gene-grid">`;
+      sec.genes.forEach(g => { html += renderCard(g); });
+      html += `</div></div>`;
+    });
+  } else {
+    html += `<div class="section-block"><div class="section-header"><h2>All Variants — Sorted by Score</h2><span class="count">${filtered.length} variants</span></div>`;
+    html += `<div class="gene-grid">`;
+    filtered.forEach(g => { html += renderCard(g); });
+    html += `</div></div>`;
+  }
+
+  content.innerHTML = html;
+  content.querySelectorAll('.gene-card').forEach(el => {
+    el.addEventListener('click', () => {
+      const snp = el.dataset.snp;
+      openModal(snp);
+    });
+  });
+}
+
+function renderCard(g) {
+  const cClass = getCardClass(g.score);
+  const sClass = getScoreClass(g.score);
+  const sign = g.score > 0 ? '+' : '';
+  return `<div class="gene-card ${cClass}" data-snp="${g.snp}">
+    <div class="card-top">
+      <div>
+        <div class="card-gene">${g.gene}</div>
+        <span class="card-snp">${g.snp}</span><span class="card-genotype">${g.genotype}</span>
+      </div>
+      <div class="card-score ${sClass}">${sign}${g.score}</div>
+    </div>
+    <div class="card-summary">${g.summary}</div>
+    <div class="card-expand">Click for details →</div>
+  </div>`;
+}
+
+function openModal(snp) {
+  const allGenes = getAllGenes();
+  const g = allGenes.find(x => x.snp === snp);
+  if (!g) return;
+  const sign = g.score > 0 ? '+' : '';
+  const sClass = getScoreClass(g.score);
+  const label = getScoreLabel(g.score);
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-gene">${g.sectionIcon} ${g.sectionTitle}</div>
+    <h3>${g.gene}</h3>
+    <div class="modal-meta">
+      <span class="meta-tag">${g.snp}</span>
+      <span class="meta-tag">Genotype: ${g.genotype}</span>
+      <span class="meta-tag card-score ${sClass}" style="border:none">Score: ${sign}${g.score} — ${label}</span>
+    </div>
+    <div class="modal-summary">${g.summary}</div>
+    <div class="modal-action">
+      <h4>Recommended Action</h4>
+      <p>${g.action}</p>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function updateStats() {
+  const all = getAllGenes();
+  document.getElementById('totalCount').textContent = all.length;
+  document.getElementById('favCount').textContent = all.filter(g => g.score > 0).length;
+  document.getElementById('conCount').textContent = all.filter(g => g.score < 0).length;
+}
+
+function render() {
+  renderNav();
+  renderContent();
+}
+
+// Events
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderContent();
+});
+
+document.querySelectorAll('.pill').forEach(el => {
+  el.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    activeFilter = el.dataset.filter;
+    renderContent();
+  });
+});
+
+document.getElementById('sortBtn').addEventListener('click', () => {
+  const btn = document.getElementById('sortBtn');
+  if (sortMode === 'section') { sortMode = 'score-desc'; btn.textContent = 'Sort: Best First ↓'; }
+  else if (sortMode === 'score-desc') { sortMode = 'score-asc'; btn.textContent = 'Sort: Worst First ↑'; }
+  else { sortMode = 'section'; btn.textContent = 'Sort: Section ↓'; }
+  renderContent();
+});
+
+document.getElementById('modalClose').addEventListener('click', () => {
+  document.getElementById('modalOverlay').classList.remove('open');
+});
+document.getElementById('modalOverlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) document.getElementById('modalOverlay').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
+});
+
+// Init
+updateStats();
+render();
+</script>
+</body>
+</html>
